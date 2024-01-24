@@ -58,16 +58,15 @@ class Hawaiian(BasePizza):
 
 
 def log_execution_time(func):
-    """Декоратор для логирования времени выполнения функции."""
+    """
+    Декоратор, который выводит случайное время выполнения
+    в дополнение к выводу функции
+    """
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        """Обертка функции с логированием времени выполнения."""
-        start_time = random.randint(1, 5)
-        result = func(*args, **kwargs)
-        end_time = random.randint(1, 5)
-        print(f"Function '{func.__name__}' be ready in {end_time - start_time} hour(s)")
-        return result
+        original_result = func(*args, **kwargs)  # результат ф-ции до декорирования
+        return f'{original_result} - {random.randint(1, 10)}с!'
 
     return wrapper
 
@@ -89,18 +88,17 @@ def menu():
 @click.command()
 @click.argument('type')
 @click.option('--size', default='L', help='Size of the pizza (L, XL)')
+@click.option('--delivery', is_flag=True, help='Include if you want delivery')
 @log_execution_time
-def order(type, size):
-    """Обрабатывает заказ пиццы."""
-    pizza_classes = {'margherita': Margherita, 'pepperoni': Pepperoni, 'hawaiian': Hawaiian}
-    try:
-        pizza = pizza_classes[type.lower()](size)
-        click.echo(f"YOUR ORDER: {pizza.get_description()}")
-        click.echo(pizza.dict())
-    except KeyError:
-        click.echo("NO SUCH TYPE OF PIZZA")
-    except ValueError as e:
-        click.echo(e)
+def order(type: str, size: str, delivery: bool):
+    '''Готовит и доставляет пиццу'''
+
+    if type.strip().lower() not in ('pepperoni', 'hawaiian', 'margherita'):
+        print('We don\'t have this kind of pizza, call back later.')
+    else:
+        print(f'Prepared for {random.randint(1, 10)}с!')
+        if delivery:
+            print(f'Delivered in {random.randint(1, 10)}с!')
 
 
 cli.add_command(menu)
